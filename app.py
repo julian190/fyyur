@@ -13,6 +13,8 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
+from models import Venue,Show,Artist
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -24,58 +26,11 @@ db = SQLAlchemy(app)
 
 # Done: connect to a local postgresql database
 app.config['SQLALCHEMY_DATABASE_URI']= 'postgres://postgres@localhost:5432/fyyur'
+app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 migrate = Migrate(app,db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-
-class Venue(db.Model):
-    __tablename__ = 'Venue'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    shows = db.relationship('Show', backref='venue', lazy=True)
-
-
-
-
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-class Artist(db.Model):
-    __tablename__ = 'Artist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    shows = db.relationship('Show', backref='artist', lazy=True)
-
-class Show(db.Model):
-  id = db.Column(db.Integer,primary_key=True)
-  venue_id = db.Column(db.Integer,db.ForeignKey("Venue.id"))
-  artist_id = db.Column(db.Integer,db.ForeignKey("Artist.id"))
-  start_time = db.Column(db.DateTime,default=datetime.utcnow())
-
-
-
-
-
-
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -597,7 +552,7 @@ def create_artist_submission():
   state = request.form.get('state')
   address = request.form.get('address')
   phone = request.form.get('phone')
-  artest = Artist(name=name,city=city,state=state,address=address,phone=phone)
+  artest = Artist(name=name,city=city,state=state,phone=phone)
   error = False
   try:
     db.session.add(artest)
